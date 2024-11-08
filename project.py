@@ -69,6 +69,44 @@ def generate_rsa_key(password: bytes, filename: str):
     )
 
 
+def load_key(filename: str, password: bytes = None):
+    """Load and decrypt an AES or RSA key from a file."""
+    with open(filename, "rb") as key_file:
+        key_data = key_file.read()
+
+    # AES key load
+    if filename.endswith(".key"):
+        salt, iv, encrypted_key = key_data[:16], key_data[16:32], key_data[32:]
+        derived_key = derive_key_from_password(password, salt)
+
+        cipher = Cipher(
+            algorithms.AES(derived_key), modes.CBC(iv), backend=default_backend()
+        )
+        decryptor = cipher.decryptor()
+        padded_key = decryptor.update(encrypted_key) + decryptor.finalize()
+
+        unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
+        aes_key = unpadder.update(padded_key) + unpadder.finalize()
+        return aes_key
+
+    # RSA private key load
+    elif filename.endswith("_rsa_private.pem"):
+        private_key = serialization.load_pem_private_key(
+            key_data, password=password, backend=default_backend()
+        )
+        return private_key
+
+    # RSA public key load
+    elif filename.endswith("_rsa_public.pem"):
+        public_key = serialization.load_pem_public_key(
+            key_data, backend=default_backend()
+        )
+        return public_key
+
+    else:
+        raise ValueError("Unsupported key file format")
+
+
 def main():
     {}
 
