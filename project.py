@@ -125,6 +125,24 @@ def aes_encrypt_file(aes_key, input_file, output_file):
     print(f"File encrypted and saved to {output_file}.")
 
 
+def aes_decrypt_file(aes_key, input_file, output_file):
+    """Decrypt a file using AES."""
+    with open(input_file, "rb") as f:
+        iv = f.read(16)
+        ciphertext = f.read()
+
+    cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
+    decryptor = cipher.decryptor()
+    padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+
+    unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
+    plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
+
+    with open(output_file, "wb") as f:
+        f.write(plaintext)
+    print(f"File decrypted and saved to {output_file}.")
+
+
 def main():
     {}
 
