@@ -246,7 +246,14 @@ def guided_mode():
 
 
 def main():
-    {}
+    import sys
+
+    if len(sys.argv) == 1:
+        guided_mode()
+    else:
+        # Argument parsing and handling
+        print("Argument Mode")
+        # Will add support for arguments later
 
 
 if __name__ == "__main__":
