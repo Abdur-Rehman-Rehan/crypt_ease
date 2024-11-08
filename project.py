@@ -179,6 +179,70 @@ def rsa_decrypt_file(private_key, input_file, output_file):
     print(f"File decrypted and saved to {output_file}.")
 
 
+def guided_mode():
+    print("Guided Mode:")
+    action = input("Choose action (generate_keys, encrypt, decrypt): ").strip()
+
+    if action == "generate_keys":
+        alg = input("Choose algorithm (AES, RSA): ").strip().upper()
+        filename = input("Enter the filename for saving the key: ").strip()
+        password = getpass.getpass("Enter a password to protect the key: ").encode()
+        confirm_password = getpass.getpass("Confirm the password: ").encode()
+
+        if password != confirm_password:
+            print("Passwords do not match. Please try again.")
+            return
+
+        if alg == "AES":
+            generate_aes_key(password, filename)
+        elif alg == "RSA":
+            generate_rsa_key(password, filename)
+        else:
+            print("Unsupported algorithm.")
+
+    elif action == "encrypt":
+        alg = input("Choose algorithm (AES, RSA): ").strip().upper()
+        input_file = input("Enter the input file path: ").strip()
+        output_file = input("Enter the output file path: ").strip()
+        key_file = input(
+            "Enter the key file path (or press Enter to generate one): "
+        ).strip()
+
+        if not key_file and alg == "AES":
+            filename = input("Enter the filename for saving the new key: ").strip()
+            password = getpass.getpass("Enter a password to protect the key: ").encode()
+            confirm_password = getpass.getpass("Confirm the password: ").encode()
+
+            if password != confirm_password:
+                print("Passwords do not match. Please try again.")
+                return
+            generate_aes_key(password, filename)
+            key_file = f"{filename}.key"
+
+        password = getpass.getpass("Enter password for the key file: ").encode()
+        if alg == "AES":
+            aes_key = load_key(key_file, password)
+            aes_encrypt_file(aes_key, input_file, output_file)
+        elif alg == "RSA":
+            public_key = load_key(key_file, password)
+            rsa_encrypt_file(public_key, input_file, output_file)
+
+    elif action == "decrypt":
+        input_file = input("Enter the encrypted file path: ").strip()
+        output_file = input("Enter the output file path: ").strip()
+        key_file = input("Enter the key file path: ").strip()
+        password = getpass.getpass("Enter password for the key file: ").encode()
+
+        if key_file.endswith(".key"):
+            aes_key = load_key(key_file, password)
+            aes_decrypt_file(aes_key, input_file, output_file)
+        elif key_file.endswith("_rsa_private.pem"):
+            private_key = load_key(key_file, password)
+            rsa_decrypt_file(private_key, input_file, output_file)
+        else:
+            print("Unsupported key file format.")
+
+
 def main():
     {}
 
