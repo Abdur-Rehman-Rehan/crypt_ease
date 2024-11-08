@@ -107,6 +107,24 @@ def load_key(filename: str, password: bytes = None):
         raise ValueError("Unsupported key file format")
 
 
+def aes_encrypt_file(aes_key, input_file, output_file):
+    """Encrypt a file using AES."""
+    iv = os.urandom(16)
+    cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
+    padder = padding.PKCS7(algorithms.AES.block_size).padder()
+
+    with open(input_file, "rb") as f:
+        plaintext = f.read()
+
+    padded_data = padder.update(plaintext) + padder.finalize()
+    ciphertext = encryptor.update(padded_data) + encryptor.finalize()
+
+    with open(output_file, "wb") as f:
+        f.write(iv + ciphertext)
+    print(f"File encrypted and saved to {output_file}.")
+
+
 def main():
     {}
 
