@@ -211,7 +211,7 @@ def guided_mode():
             "Enter the key file path (or press Enter to generate one): "
         ).strip()
 
-        if not key_file and alg == "AES" or alg == "1":
+        if not key_file and (alg == "AES" or alg == "1"):
             filename = input("Enter the filename for saving the new key: ").strip()
             password = getpass.getpass("Enter a password to protect the key: ").encode()
             confirm_password = getpass.getpass("Confirm the password: ").encode()
