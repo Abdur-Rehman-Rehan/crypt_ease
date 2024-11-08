@@ -143,6 +143,23 @@ def aes_decrypt_file(aes_key, input_file, output_file):
     print(f"File decrypted and saved to {output_file}.")
 
 
+def rsa_encrypt_file(public_key, input_file, output_file):
+    """Encrypt a file using RSA."""
+    with open(input_file, "rb") as f:
+        plaintext = f.read()
+
+    ciphertext = public_key.encrypt(
+        plaintext,
+        OAEP(
+            mgf=MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None
+        ),
+    )
+
+    with open(output_file, "wb") as f:
+        f.write(ciphertext)
+    print(f"File encrypted and saved to {output_file}.")
+
+
 def main():
     {}
 
