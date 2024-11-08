@@ -183,10 +183,10 @@ def rsa_decrypt_file(private_key, input_file, output_file):
 
 def guided_mode():
     print("Guided Mode:")
-    action = input("Choose action (generate_keys, encrypt, decrypt): ").strip()
+    action = input("Choose action (generate_keys(g), encrypt(e), decrypt(d)): ").strip()
 
-    if action == "generate_keys":
-        alg = input("Choose algorithm (AES, RSA): ").strip().upper()
+    if action == "generate_keys" or action == "g":
+        alg = input("Choose algorithm AES(1), RSA(2): ").strip().upper()
         filename = input("Enter the filename for saving the key: ").strip()
         password = getpass.getpass("Enter a password to protect the key: ").encode()
         confirm_password = getpass.getpass("Confirm the password: ").encode()
@@ -195,22 +195,23 @@ def guided_mode():
             print("Passwords do not match. Please try again.")
             return
 
-        if alg == "AES":
+        if alg == "AES" or alg == "1":
             generate_aes_key(password, filename)
-        elif alg == "RSA":
+        elif alg == "RSA" or alg == "2":
             generate_rsa_key(password, filename)
         else:
             print("Unsupported algorithm.")
+            sys.exit()
 
-    elif action == "encrypt":
-        alg = input("Choose algorithm (AES, RSA): ").strip().upper()
+    elif action == "encrypt" or action == "e":
+        alg = input("Choose algorithm AES(1), RSA(2)): ").strip().upper()
         input_file = input("Enter the input file path: ").strip()
         output_file = input("Enter the output file path: ").strip()
         key_file = input(
             "Enter the key file path (or press Enter to generate one): "
         ).strip()
 
-        if not key_file and alg == "AES":
+        if not key_file and alg == "AES" or alg == "1":
             filename = input("Enter the filename for saving the new key: ").strip()
             password = getpass.getpass("Enter a password to protect the key: ").encode()
             confirm_password = getpass.getpass("Confirm the password: ").encode()
@@ -222,14 +223,14 @@ def guided_mode():
             key_file = f"{filename}.key"
 
         password = getpass.getpass("Enter password for the key file: ").encode()
-        if alg == "AES":
+        if alg == "AES" or alg == "1":
             aes_key = load_key(key_file, password)
             aes_encrypt_file(aes_key, input_file, output_file)
-        elif alg == "RSA":
+        elif alg == "RSA" or alg == "2":
             public_key = load_key(key_file, password)
             rsa_encrypt_file(public_key, input_file, output_file)
 
-    elif action == "decrypt":
+    elif action == "decrypt" or action == "d":
         input_file = input("Enter the encrypted file path: ").strip()
         output_file = input("Enter the output file path: ").strip()
         key_file = input("Enter the key file path: ").strip()
@@ -243,6 +244,7 @@ def guided_mode():
             rsa_decrypt_file(private_key, input_file, output_file)
         else:
             print("Unsupported key file format.")
+            sys.exit()
 
 
 def main():
